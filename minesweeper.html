@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Minesweeper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            gap: 2px;
+            margin: 0 auto;
+            margin-left: 38.8%;
+
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: crosshair;
+            color: orange;
+
+        }
+
+        h1 {
+            color: black;
+        }
+
+        p {
+            color: black;
+        }
+
+        body {
+            background-color: white;
+        }
+
+        button {
+            background-color: white;
+
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Minesweeper</h1>
+    <div id="game-board"></div>
+    <p>Left-click to uncover a tile, right-click to flag a mine.Relode page when red square appears.(That Menas U Lose)
+        Marked Squares Appear with an F</p>
+
+    <script>
+        const boardSize = 10;
+        const numMines = 20;
+        let board = [];
+        let mines = new Set();
+        let gameOver = false;
+
+        const gameBoard = document.getElementById("game-board");
+
+        function initializeGame() {
+            board = createEmptyBoard(boardSize, boardSize);
+            mines = generateMines(boardSize, boardSize, numMines);
+            renderBoard();
+        }
+
+        function createEmptyBoard(rows, cols) {
+            return Array.from({ length: rows }, () => Array.from({ length: cols }, () => 0));
+        }
+
+        function generateMines(rows, cols, numMines) {
+            const mines = new Set();
+
+            while (mines.size < numMines) {
+                const row = Math.floor(Math.random() * rows);
+                const col = Math.floor(Math.random() * cols);
+                mines.add(`${row}-${col}`);
+            }
+
+            return mines;
+        }
+
+        function renderBoard() {
+            gameBoard.innerHTML = '';
+
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    const cell = document.createElement("div");
+                    cell.className = "cell";
+
+                    if (board[row][col] === 1) {
+                        cell.textContent = "M";
+                    }
+
+                    cell.addEventListener("click", () => {
+                        if (!gameOver) {
+                            if (mines.has(`${row}-${col}`)) {
+                                gameOver = true;
+                                cell.style.backgroundColor = "red";
+                            } else {
+                                const adjacentMines = countAdjacentMines(row, col);
+                                cell.textContent = adjacentMines > 0 ? adjacentMines : '';
+                                cell.style.backgroundColor = "black";
+
+                            }
+                        }
+                    });
+                    cell.addEventListener("contextmenu", (e) => {
+                        e.preventDefault();
+                        if (!gameOver) {
+                            if (cell.textContent === "F") {
+                                cell.textContent = '';
+                            } else {
+                                cell.textContent = "F";
+                            }
+                        }
+                    });
+
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
+
+        function countAdjacentMines(row, col) {
+            let count = 0;
+
+            for (let r = -1; r <= 1; r++) {
+                for (let c = -1; c <= 1; c++) {
+                    if (r === 0 && c === 0) continue;
+                    const newRow = row + r;
+                    const newCol = col + c;
+                    if (mines.has(`${newRow}-${newCol}`)) {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        initializeGame();
+    </script>
+    <button onclick="location.href='index.html'">Home</button>
+</body>
+
+</html>

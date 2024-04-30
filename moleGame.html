@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>kill The Hub's Mole</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: white;
+        }
+
+        .hole {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #000;
+            display: inline-block;
+            margin: 10px;
+            position: relative;
+            background-color: black;
+
+        }
+
+        .mole {
+            width: 50px;
+            height: 50px;
+            background-color: orange;
+            border-radius: 50%;
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            display: none;
+        }
+
+        h1 {
+            color: black;
+
+
+        }
+
+        p {
+
+            color: black;
+        }
+
+        button {
+            background-color: white;
+
+
+        }
+
+        button {
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Whack-A-Mole Game</h1>
+    <p>Click on the moles to score points. You have 30 seconds!</p>
+    <p>Score: <span id="score">0</span></p>
+    <button onclick="startGame()">Start Game</button>
+    <div id="game-container">
+        <div class="hole" onclick="whack(this)">
+            <div class="mole"></div>
+        </div>
+        <div class="hole" onclick="whack(this)">
+            <div class="mole"></div>
+        </div>
+        <div class="hole" onclick="whack(this)">
+            <div class="mole"></div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let timeLeft = 30;
+
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            document.getElementById("score").textContent = score;
+            startTimer();
+            generateMole();
+        }
+
+        function startTimer() {
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Game Over! Your final score is " + score);
+                }
+            }, 1000);
+        }
+
+        function generateMole() {
+            const holes = document.querySelectorAll('.hole');
+            const randomHole = holes[Math.floor(Math.random() * holes.length)];
+            const mole = randomHole.querySelector('.mole');
+
+            mole.style.display = 'block';
+
+            setTimeout(() => {
+                mole.style.display = 'none';
+                if (timeLeft > 0) {
+                    generateMole();
+                }
+            }, 1000);
+        }
+
+        function whack(hole) {
+            const mole = hole.querySelector('.mole');
+            if (mole.style.display === 'block') {
+                mole.style.display = 'none';
+                score++;
+                document.getElementById("score").textContent = score;
+            }
+        }
+    </script>
+    <button onclick="location.href='index.html'">Home</button>
+</body>
+
+</html>

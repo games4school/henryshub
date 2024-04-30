@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #message {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        #cards {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 100px;
+            height: 150px;
+            border: 1px solid black;
+            margin: 5px;
+            text-align: center;
+            line-height: 150px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="message">Welcome to Blackjack!</div>
+    <div id="cards">
+        <div id="player-hand"></div>
+        <div id="Henry-hand"></div>
+    </div>
+    <button id="deal-button">Deal</button>
+    <button id="hit-button">Hit</button>
+    <button id="stand-button">Stand</button>
+
+    <script>
+        let deck = [];
+        const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+        function createDeck() {
+            for (let suitIdx = 0; suitIdx < suits.length; suitIdx++) {
+                for (let valueIdx = 0; valueIdx < values.length; valueIdx++) {
+                    let card = {
+                        value: values[valueIdx],
+                        suit: suits[suitIdx]
+                    };
+                    deck.push(card);
+                }
+            }
+        }
+
+        function getCardString(card) {
+            return card.value + ' of ' + card.suit;
+        }
+
+        function shuffleDeck() {
+            for (let i = 0; i < deck.length; i++) {
+                let swapIdx = Math.floor(Math.random() * deck.length);
+                let tmp = deck[swapIdx];
+                deck[swapIdx] = deck[i];
+                deck[i] = tmp;
+            }
+        }
+
+        function getNextCard() {
+            return deck.shift();
+        }
+
+        let HenryCards = [];
+        let playerCards = [];
+
+        function getCardNumericValue(card) {
+            switch (card.value) {
+                case 'A':
+                    return 11;
+                case '2':
+                    return 2;
+                case '3':
+                    return 3;
+                case '4':
+                    return 4;
+                case '5':
+                    return 5;
+                case '6':
+                    return 6;
+                case '7':
+                    return 7;
+                case '8':
+                    return 8;
+                case '9':
+                    return 9;
+                default:
+                    return 10;
+            }
+        }
+
+        function getScore(cardArray) {
+            let score = 0;
+            let hasAce = false;
+            for (let i = 0; i < cardArray.length; i++) {
+                let card = cardArray[i];
+                score += getCardNumericValue(card);
+                if (card.value === 'A') {
+                    hasAce = true;
+                }
+            }
+            if (hasAce && score + 10 <= 21) {
+                return score + 10;
+            }
+            return score;
+        }
+
+        function updateScores() {
+            HenryScore = getScore(HenryCards);
+            playerScore = getScore(playerCards);
+        }
+
+        function checkForEndOfGame() {
+            updateScores();
+            if (gameOver) {
+                // let Henry take cards
+                while (HenryScore < playerScore && playerScore <= 21 && HenryScore <= 21) {
+                    HenryCards.push(getNextCard());
+                    updateScores();
+                }
+            }
+
+            if (playerScore > 21) {
+                gameOver = true;
+                message = "You busted!";
+            } else if (HenryScore > 21) {
+                gameOver = true;
+                message = "Henry busted! You win!";
+            } else if (gameOver) {
+                if (playerScore > HenryScore) {
+                    message = "You win!";
+                } else if (playerScore === HenryScore) {
+                    message = "Push!";
+                } else {
+                    message = "You lose!";
+                }
+            }
+        }
+
+        let gameOver = false,
+            playerWon = false,
+            HenryScore = 0,
+            playerScore = 0,
+            message = '';
+
+        function updateDisplay() {
+            if (!gameStarted) {
+                message = "Welcome to Blackjack!";
+            } else {
+                updateScores();
+                message = "Henry has: <br>";
+                if (!gameOver) {
+                    message += getCardString(HenryCards[0]) + "<br>";
+                } else {
+                    for (let i = 0; i < HenryCards.length; i++) {
+                        message += getCardString(HenryCards[i]) + "<br>";
+                    }
+                }
+                message += "(score: " + (gameOver ? HenryScore : getCardNumericValue(HenryCards[0])) + ")<br><br>";
+
+                message += "Player has: <br>";
+                for (let i = 0; i < playerCards.length; i++) {
+                    message += getCardString(playerCards[i]) + "<br>";
+                }
+                message += "(score: " + playerScore + ")<br><br>";
+            }
+            document.getElementById('message').innerHTML = message;
+        }
+
+        let gameStarted = false;
+
+        document.getElementById('deal-button').addEventListener('click', function () {
+            gameStarted = true;
+            gameOver = false;
+            deck = [];
+            createDeck();
+            shuffleDeck();
+            HenryCards = [getNextCard(), getNextCard()];
+            playerCards = [getNextCard(), getNextCard()];
+            updateDisplay();
+        });
+
+        document.getElementById('hit-button').addEventListener('click', function () {
+            if (gameStarted && !gameOver) {
+                playerCards.push(getNextCard());
+                checkForEndOfGame();
+                updateDisplay();
+            }
+        });
+
+        document.getElementById('stand-button').addEventListener('click', function () {
+            if (gameStarted && !gameOver) {
+                gameOver = true;
+                checkForEndOfGame();
+                updateDisplay();
+            }
+        });
+
+    </script>
+</body>
+
+</html>

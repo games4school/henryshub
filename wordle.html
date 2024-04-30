@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herdle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #wordInput {
+            padding: 5px;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        #submitBtn {
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #result {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Herdle</h1>
+    <p>Guess the secret word! :\</p>
+    <p>*If a letter in the guess matches a letter in the secret word and is in the correct position, it is shown in
+        upper case in the result.</p>
+    <p>
+        * If a letter in the guess matches a letter in the secret word but is not in the correct position, it is shown
+        in lower case in the result.</p>
+    <p> *If a letter in the guess does not match any letter in the secret word, it is represented by a hyphen "-" in the
+        result.</p>
+    <div id="wordInputDiv">
+        <input type="text" id="wordInput" maxlength="5" autocomplete="off" placeholder="guess a word">
+        <button id="submitBtn">Submit</button>
+    </div>
+    <div id="result"></div>
+
+    <script>
+
+
+        const words = [
+            "apple", "plane", "white", "black", "sauce",
+            "house", "flame", "sword", "water", "blend",
+            "stone", "dream", "crisp", "tooth", "snake",
+            "gummy", "cloud", "earth", "brush", "plank",
+            "fiend", "grasp", "swell", "frost", "swirl",
+            "thorn", "blaze", "frost", "hound", "toast",
+            "trump", "prawn", "comet", "peach", "plane",
+            "stork", "fetch", "grape", "sleep", "plush",
+            "shell", "blink", "bloom", "brush", "skirt",
+            "glint", "crumb", "quirk", "bloom", "scout",
+            "ghost", "glint", "flake", "grime", "surge",
+            "pearl", "twist", "flick", "grate", "crash",
+            "moose", "brass", "swirl", "plush", "stoop",
+            "flick", "grass", "quake", "ferry", "stash",
+            "plush", "spice", "twist", "crack", "steam",
+            "click", "spark", "frost", "braid", "lurch",
+            "blend", "grunt", "storm", "spire", "drone",
+            "booms", "slope", "chase", "crash", "float",
+            "budge", "blink", "forge", "trump", "hunch",
+            "snare", "pearl", "glide", "braid", "feast",
+            "curve", "trump", "trawl", "bloom", "slate"
+        ];
+
+
+
+        const secretWord = words[Math.floor(Math.random() * words.length)];
+
+
+        // Initialize attempts
+        let attempts = 0;
+
+        // Event listener for submit button
+        document.getElementById("submitBtn").addEventListener("click", function () {
+            const guess = document.getElementById("wordInput").value.toLowerCase();
+            if (guess.length !== 5) {
+                alert("Please enter a 5-letter word.");
+                return;
+            }
+            attempts++;
+            const result = checkGuess(guess);
+            displayResult(result);
+        });
+
+        // Function to check the guess
+        function checkGuess(guess) {
+            let result = "";
+            for (let i = 0; i < guess.length; i++) {
+                if (guess[i] === secretWord[i]) {
+                    result += guess[i].toUpperCase();
+                } else if (secretWord.includes(guess[i])) {
+                    result += guess[i];
+                } else {
+                    result += "-";
+                }
+            }
+            return result;
+        }
+
+        // Function to display result
+        function displayResult(result) {
+            document.getElementById("result").textContent = result;
+            if (result === secretWord.toUpperCase()) {
+                document.getElementById("wordInputDiv").style.display = "none";
+                document.getElementById("result").textContent = `Congratulations! You guessed the word "${secretWord}" in ${attempts} attempts.`;
+            }
+        }
+    </script>
+</body>
+
+</html>
